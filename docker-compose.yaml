@@ -1,12 +1,12 @@
 name: modelfactory
 
 services:
-  pytorch:
+  huggingface:
     build:
       context: .
       dockerfile: huggingface/Dockerfile
-    image: model-factory:latest
-    container_name: pytorch
+    image: huggingface:latest
+    container_name: huggingface
     working_dir: /workspace
     ipc: host
     stdin_open: true

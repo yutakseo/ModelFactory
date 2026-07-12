@@ -12,13 +12,13 @@ TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
 
 ## 서비스
 
-### `pytorch`
+### `huggingface`
 
 모델 개발, 학습 및 변환 작업을 위한 컨테이너입니다.
 
-- 로컬 이미지: `model-factory:latest`
+- 로컬 이미지: `huggingface:latest`
 - 베이스 이미지: `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
-- 컨테이너 이름: `pytorch`
+- 컨테이너 이름: `huggingface`
 - 작업 경로: `/workspace`
 - 공유 메모리: `128gb`
 - GPU: 전체 GPU 사용
@@ -64,7 +64,7 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 모든 작업 파일과 캐시는 Docker named volume이 아닌 호스트의 `huggingface/`
 폴더에 저장됩니다.
 
-| 호스트 경로 | `pytorch` 컨테이너 | `triton` 컨테이너 |
+| 호스트 경로 | `huggingface` 컨테이너 | `triton` 컨테이너 |
 |---|---|---|
 | `./huggingface` | `/workspace` | - |
 | `./huggingface/.cache/huggingface` | `/workspace/.cache/huggingface` | `/root/.cache/huggingface` |
@@ -114,20 +114,20 @@ docker compose up -d --build
 서비스를 개별적으로 시작할 수도 있습니다.
 
 ```bash
-docker compose up -d pytorch
+docker compose up -d huggingface
 docker compose up -d triton
 ```
 
 PyTorch 컨테이너에 접속합니다.
 
 ```bash
-docker exec -it pytorch bash
+docker exec -it huggingface bash
 ```
 
 GPU 인식 여부를 확인합니다.
 
 ```bash
-docker exec pytorch python -c \
+docker exec huggingface python -c \
   "import torch; print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0))"
 ```
 
@@ -155,8 +155,8 @@ docker compose down
 `requirements.txt`를 변경한 뒤 PyTorch 이미지를 다시 빌드합니다.
 
 ```bash
-docker compose build pytorch
-docker compose up -d pytorch
+docker compose build huggingface
+docker compose up -d huggingface
 ```
 
 ## 참고사항
