@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: huggingface/Dockerfile
-    image: huggingface:latest
+    image: mf-huggingface:latest
     container_name: huggingface
     working_dir: /workspace
     ipc: host
@@ -27,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: triton/Dockerfile
-    image: triton-inference-server:latest
+    image: mf-triton-server:latest
     container_name: triton
     ipc: host
     shm_size: "64gb"
