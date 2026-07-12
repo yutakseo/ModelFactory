@@ -1,9 +1,11 @@
+name: modelfactory
+
 services:
   pytorch:
     build:
       context: .
       dockerfile: huggingface/Dockerfile
-    image: huggingface-workspace:latest
+    image: model-factory:latest
     container_name: pytorch
     working_dir: /workspace
     ipc: host
@@ -25,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: triton/Dockerfile
-    image: triton-llm-workspace:latest
+    image: triton-inference-server:latest
     container_name: triton
     ipc: host
     shm_size: "64gb"
