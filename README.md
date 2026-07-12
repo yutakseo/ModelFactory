@@ -28,7 +28,8 @@ TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
 
 `requirements.txt`에 정의된 JupyterLab, IPykernel, Transformers, Datasets,
 Ultralytics 및 데이터 과학 패키지가 이미지 빌드 중 설치됩니다. PyTorch는
-베이스 이미지에 포함되어 있습니다.
+베이스 이미지에 포함되어 있습니다. Node.js와 npm은 베이스 이미지의
+Ubuntu/Debian 패키지 저장소를 통해 설치됩니다.
 
 ### `triton`
 
