@@ -1,6 +1,6 @@
 # ModelFactory Docker Workspace
 
-![ModelFactory AI model workshop](assets/modelfactory-hero.png)
+![ModelFactory AI model workshop](assets/modelfactory-hero_title.png)
 
 PyTorch와 Hugging Face로 모델을 개발하고, NVIDIA Triton Inference Server와
 TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
