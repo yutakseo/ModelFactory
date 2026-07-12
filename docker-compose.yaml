@@ -19,7 +19,8 @@ services:
       HF_DATASETS_CACHE: /workspace/.cache/huggingface/datasets
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:
-      - ./huggingface:/workspace
+      - ./huggingface/workspace:/workspace
+      - ./huggingface/model_repository:/triton-server
       - /mnt/datasets:/datasets
     command: sleep infinity
 
