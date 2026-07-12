@@ -1,0 +1,27 @@
+# Jupyter
+ipykernel
+jupyterlab
+ipywidgets
+
+# Hugging Face
+transformers
+datasets
+accelerate
+evaluate
+huggingface-hub
+safetensors
+sentencepiece
+protobuf
+
+# Data science and utilities
+numpy
+scipy
+pandas
+scikit-learn
+matplotlib
+seaborn
+pillow
+opencv-python-headless
+tqdm
+tensorboard
+ultralytics

@@ -1,7 +1,10 @@
 services:
-  huggingface:
-    image: huggingface/transformers-pytorch-gpu:latest
-    container_name: huggingface
+  pytorch:
+    build:
+      context: .
+      dockerfile: huggingface/Dockerfile
+    image: huggingface-workspace:latest
+    container_name: pytorch
     working_dir: /workspace
     ipc: host
     stdin_open: true
@@ -10,14 +13,36 @@ services:
     gpus: all
     environment:
       HF_HOME: /workspace/.cache/huggingface
-      TRANSFORMERS_CACHE: /workspace/.cache/huggingface/hub
+      HF_HUB_CACHE: /workspace/.cache/huggingface/hub
       HF_DATASETS_CACHE: /workspace/.cache/huggingface/datasets
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:
-      - ./workspace:/workspace
-      - hf-hub-cache:/workspace/.cache/huggingface
+      - ./huggingface:/workspace
       - /mnt/datasets:/datasets
     command: sleep infinity
 
-volumes:
-  hf-hub-cache:
+  triton:
+    build:
+      context: .
+      dockerfile: triton/Dockerfile
+    image: triton-llm-workspace:latest
+    container_name: triton
+    ipc: host
+    shm_size: "64gb"
+    gpus: all
+    ulimits:
+      memlock: -1
+    environment:
+      HF_HOME: /root/.cache/huggingface
+      HF_TOKEN: ${HF_TOKEN:-}
+    ports:
+      - "18000:8000"
+      - "18001:8001"
+      - "18002:8002"
+    volumes:
+      - ./huggingface/.cache/huggingface:/root/.cache/huggingface
+      - ./huggingface/model_repository:/models
+    command:
+      - /bin/bash
+      - -c
+      - exec tritonserver --model-repository=/models

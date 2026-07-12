@@ -1,2 +1,3 @@
-workspace/.cache/
-workspace/*
+huggingface/.cache/
+huggingface/model_repository/*
+!huggingface/model_repository/.gitkeep

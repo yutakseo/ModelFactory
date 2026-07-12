@@ -14,12 +14,13 @@ Transformers with PyTorch GPU support.
 
 ## Services
 
-### `huggingface`
+### `pytorch`
 
 The Compose file starts one long-running container:
 
-- Image: `huggingface/transformers-pytorch-gpu:latest`
-- Container name: `huggingface`
+- Image: locally built `huggingface-workspace:latest`
+- Base image: `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
+- Container name: `pytorch`
 - Working directory: `/workspace`
 - GPU access: `gpus: all`
 - Shared memory: `128gb`
@@ -29,35 +30,58 @@ The Compose file starts one long-running container:
 The container is intended to stay running so you can enter it interactively and
 run notebooks, scripts, training jobs, or inference commands.
 
+### `triton`
+
+The Triton container uses NVIDIA's TensorRT-LLM-enabled Triton image and serves
+the shared model repository over host ports HTTP (`18000`), gRPC (`18001`), and
+metrics (`18002`). These map to container ports `8000`, `8001`, and `8002`.
+
 ## Directory Layout
 
 ```text
 .
+├── huggingface/
+│   └── Dockerfile
+├── triton/
+│   └── Dockerfile
 ├── docker-compose.yaml
+├── requirements.txt
 ├── README.md
-└── workspace/              # Mounted to /workspace inside the container
 ```
 
-The `workspace` directory is mounted into the container at `/workspace`. Put your
-training scripts, notebooks, model code, and experiment files there.
+The `huggingface` directory is mounted into the container at `/workspace`. Put
+your training scripts, notebooks, model code, and experiment files there.
 
 ## Cache and Data Mounts
 
-The environment uses these Hugging Face cache paths:
+The PyTorch container uses these Hugging Face cache paths, all visible under
+the host's `huggingface/.cache/huggingface` directory:
 
 ```text
 HF_HOME=/workspace/.cache/huggingface
-TRANSFORMERS_CACHE=/workspace/.cache/huggingface/hub
+HF_HUB_CACHE=/workspace/.cache/huggingface/hub
 HF_DATASETS_CACHE=/workspace/.cache/huggingface/datasets
 ```
 
-Compose also creates a named Docker volume:
+The same host cache is mounted in the Triton container at:
 
 ```text
-hf-hub-cache
+/root/.cache/huggingface
 ```
 
-This keeps downloaded models and datasets available across container restarts.
+Create or export Triton models from the PyTorch container under:
+
+```text
+/workspace/model_repository
+```
+
+This is the host's `huggingface/model_repository` directory, mounted into the
+Triton container at `/models`. For example:
+
+```text
+huggingface/model_repository/<model-name>/config.pbtxt
+huggingface/model_repository/<model-name>/1/<model-file>
+```
 
 The host path `/mnt/datasets` is mounted into the container as:
 
@@ -81,16 +105,35 @@ Hub access.
 
 ## Usage
 
-Start the container:
+Build and start both containers:
 
 ```bash
 docker compose up -d
 ```
 
+Start only the development container or only the inference server:
+
+```bash
+docker compose up -d pytorch
+docker compose up -d triton
+```
+
+On the first run, Compose builds the local image and installs the packages from
+`requirements.txt`. Rebuild the image after changing dependencies:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+The dependency set includes JupyterLab, IPykernel, common Hugging Face
+libraries, and standard data science tools. PyTorch is provided by the base
+image.
+
 Open an interactive shell:
 
 ```bash
-docker exec -it huggingface bash
+docker exec -it pytorch bash
 ```
 
 Run a quick GPU check inside the container:
@@ -113,8 +156,8 @@ docker compose down -v
 
 ## Notes
 
-- The image tag uses `latest`, so builds may change over time. Pin a specific
-  image tag in `docker-compose.yaml` if you need reproducible environments.
+- Local build outputs use `latest`; their base images are pinned in each
+  Dockerfile.
 - `shm_size: "128gb"` is useful for large dataloaders, but it should not exceed
   what your host can reasonably provide.
 - `ipc: host` is commonly used for PyTorch multiprocessing workloads, but it
