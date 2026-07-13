@@ -25,3 +25,4 @@ opencv-python-headless
 tqdm
 tensorboard
 ultralytics
+datasets

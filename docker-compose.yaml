@@ -21,7 +21,7 @@ services:
     volumes:
       - ./huggingface/workspace:/workspace
       - ./huggingface/model_repository:/triton-server
-      - /mnt/datasets:/datasets
+      - /mnt/datasets:/workspace/datasets
     command: sleep infinity
 
   triton:
