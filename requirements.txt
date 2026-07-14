@@ -12,6 +12,9 @@ huggingface-hub
 safetensors
 sentencepiece
 protobuf
+ultralytics
+datasets
+diffusers
 
 # Data science and utilities
 numpy
@@ -24,6 +27,3 @@ pillow
 opencv-python-headless
 tqdm
 tensorboard
-ultralytics
-datasets
-diffusers
