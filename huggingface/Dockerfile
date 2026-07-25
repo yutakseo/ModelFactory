@@ -5,6 +5,7 @@ RUN apt-get update \
         bubblewrap \
         nodejs \
         npm \
+        git \
     && npm install --global @openai/codex \
     && rm -rf /var/lib/apt/lists/* 
 
