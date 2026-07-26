@@ -18,7 +18,7 @@ TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
 
 모델 개발, 학습 및 변환 작업을 위한 컨테이너입니다.
 
-- 로컬 이미지: `huggingface:latest`
+- 로컬 이미지: `mf-huggingface:latest`
 - 베이스 이미지: `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
 - 컨테이너 이름: `huggingface`
 - 작업 경로: `/workspace`
@@ -35,7 +35,7 @@ Ubuntu/Debian 패키지 저장소를 통해 설치됩니다.
 
 TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 
-- 로컬 이미지: `triton-inference-server:latest`
+- 로컬 이미지: `mf-triton-server:latest`
 - 베이스 이미지: `nvcr.io/nvidia/tritonserver:25.12-trtllm-python-py3`
 - 컨테이너 이름: `triton`
 - 모델 저장소: `/models`
@@ -56,36 +56,49 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 ├── requirements.txt
 ├── huggingface/
 │   ├── Dockerfile
-│   ├── .cache/huggingface/       # 실행 중 생성되는 Hugging Face 캐시
-│   └── model_repository/         # Triton 모델 저장소
+│   ├── workspace/
+│   │   └── .cache/huggingface/   # 실행 중 생성되는 Hugging Face 캐시
+│   └── model_repository/         # Hugging Face와 Triton이 공유하는 모델 저장소
 └── triton/
     └── Dockerfile
 ```
 
 ## 볼륨과 경로 연결
 
-모든 작업 파일과 캐시는 Docker named volume이 아닌 호스트의 `huggingface/`
-폴더에 저장됩니다.
+모든 작업 파일, 모델 저장소 및 캐시는 Docker named volume이 아닌 호스트의
+`huggingface/` 폴더에 저장됩니다.
 
 | 호스트 경로 | `huggingface` 컨테이너 | `triton` 컨테이너 |
 |---|---|---|
-| `./huggingface` | `/workspace` | - |
-| `./huggingface/.cache/huggingface` | `/workspace/.cache/huggingface` | `/root/.cache/huggingface` |
+| `./huggingface/workspace` | `/workspace` | - |
+| `./huggingface/workspace/.cache/huggingface` | `/workspace/.cache/huggingface` | `/root/.cache/huggingface` |
 | `./huggingface/model_repository` | `/workspace/model_repository` | `/models` |
-| `/mnt/datasets` | `/datasets` | - |
+| `/mnt/datasets` | `/workspace/datasets` | - |
 
 PyTorch 컨테이너에서 `/workspace/model_repository`에 모델을 내보내면 호스트의
 `huggingface/model_repository`에 저장되고, Triton은 같은 파일을 `/models`에서
 읽습니다.
 
-일반적인 모델 저장소 구조는 다음과 같습니다.
+## 모델 개발에서 Triton 서빙까지
+
+Hugging Face 컨테이너에서 모델을 학습·변환·양자화한 뒤 Triton 모델 저장소
+형식으로 `/workspace/model_repository`에 내보냅니다.
 
 ```text
-huggingface/model_repository/
+/workspace/model_repository/
 └── <model-name>/
     ├── config.pbtxt
     └── 1/
-        └── <model-file>
+        └── <quantized-model-file>
+```
+
+이 경로는 두 컨테이너에 동시에 마운트되어 별도 복사 없이 Triton에서
+`/models/<model-name>`으로 보입니다. Triton은 기본 설정에서 시작 시 모델
+저장소를 읽으므로, 실행 중에 새 모델을 추가했다면 Triton을 재시작합니다.
+
+```bash
+docker compose restart triton
+curl http://localhost:18000/v2/health/ready
 ```
 
 Hugging Face 캐시는 다음 경로를 사용합니다.

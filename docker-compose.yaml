@@ -28,7 +28,7 @@ services:
 
     volumes:
       - ./huggingface/workspace:/workspace
-      - ./huggingface/model_repository:/triton-server
+      - ./huggingface/model_repository:/workspace/model_repository
       - /mnt/datasets:/workspace/datasets
 
     command: ["sleep", "infinity"]
@@ -52,7 +52,7 @@ services:
       - "18001:8001"
       - "18002:8002"
     volumes:
-      - ./huggingface/.cache/huggingface:/root/.cache/huggingface
+      - ./huggingface/workspace/.cache/huggingface:/root/.cache/huggingface
       - ./huggingface/model_repository:/models
     command:
       - /bin/bash
