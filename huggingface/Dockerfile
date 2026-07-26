@@ -6,6 +6,7 @@ RUN apt-get update \
         nodejs \
         npm \
         git \
+        openssh-server \
     && npm install --global @openai/codex \
     && rm -rf /var/lib/apt/lists/* 
 
