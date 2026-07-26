@@ -18,7 +18,7 @@ TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
 
 모델 개발, 학습 및 변환 작업을 위한 컨테이너입니다.
 
-- 로컬 이미지: `mf-huggingface:latest`
+- 로컬 이미지: `mf-huggingface:1.0`
 - 베이스 이미지: `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
 - 컨테이너 이름: `huggingface`
 - 작업 경로: `/workspace`
@@ -35,7 +35,7 @@ Ubuntu/Debian 패키지 저장소를 통해 설치됩니다.
 
 TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 
-- 로컬 이미지: `mf-triton-server:latest`
+- 로컬 이미지: `mf-triton-server:1.0`
 - 베이스 이미지: `nvcr.io/nvidia/tritonserver:25.12-trtllm-python-py3`
 - 컨테이너 이름: `triton`
 - 모델 저장소: `/models`
