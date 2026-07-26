@@ -8,21 +8,30 @@ services:
     image: mf-huggingface:latest
     container_name: huggingface
     working_dir: /workspace
+
+    init: true
+    restart: unless-stopped
+    entrypoint: ["/workspace/.codex-remote/start.sh"]
+
     ipc: host
     stdin_open: true
     tty: true
     shm_size: "128gb"
     gpus: all
+
     environment:
       HF_HOME: /workspace/.cache/huggingface
       HF_HUB_CACHE: /workspace/.cache/huggingface/hub
       HF_DATASETS_CACHE: /workspace/.cache/huggingface/datasets
       HF_TOKEN: ${HF_TOKEN:-}
+      CODEX_HOME: /workspace/.codex-persistent
+
     volumes:
       - ./huggingface/workspace:/workspace
       - ./huggingface/model_repository:/triton-server
       - /mnt/datasets:/workspace/datasets
-    command: sleep infinity
+
+    command: ["sleep", "infinity"]
 
   triton:
     build:

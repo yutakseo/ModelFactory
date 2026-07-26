@@ -2,3 +2,5 @@ huggingface/.cache/
 huggingface/model_repository/*
 huggingface/workspace/*
 !huggingface/model_repository/.gitkeep
+huggingface/workspace/.codex-remote
+huggingface/workspace/.codex-persistent
