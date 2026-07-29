@@ -10,8 +10,16 @@ services:
     working_dir: /workspace
 
     init: true
-    restart: unless-stopped
-    entrypoint: ["/workspace/.codex-remote/start.sh"]
+    restart: always
+    entrypoint:
+      - /bin/bash
+      - -lc
+      - |
+        if [[ -x /workspace/.codex-remote/start.sh ]]; then
+          exec /workspace/.codex-remote/start.sh
+        fi
+        echo "Codex remote startup script not found; keeping the container available."
+        exec sleep infinity
 
     ipc: host
     stdin_open: true

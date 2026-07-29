@@ -17,6 +17,7 @@ datasets
 diffusers
 
 # Data science and utilities
+click>=8,<8.4,!=8.3.0
 numpy
 scipy
 pandas
