@@ -36,7 +36,7 @@ services:
     volumes:
       - ./huggingface/workspace:/workspace
       - ./huggingface/model_repository:/workspace/model_repository
-      - .huggingface/cache:/root/.codex
+      - ./huggingface/cache:/root/.codex
       - /mnt/datasets:/workspace/datasets
     command: ["sleep", "infinity"]
 

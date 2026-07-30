@@ -54,12 +54,11 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 ```text
 .
 ├── .dockerignore
-├── .huggingface/
-│   └── cache/                     # Codex 데이터(Git 제외)
 ├── docker-compose.yaml
 ├── requirements.txt
 ├── huggingface/
 │   ├── Dockerfile
+│   ├── cache/                     # Codex 데이터(Git 제외)
 │   ├── workspace/
 │   │   └── .cache/huggingface/   # 실행 중 생성되는 Hugging Face 캐시
 │   └── model_repository/         # Hugging Face와 Triton이 공유하는 모델 저장소
@@ -71,19 +70,19 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 
 작업 파일, 모델 저장소 및 Hugging Face 캐시는 호스트의 `huggingface/`
 폴더에 저장됩니다. Codex 사용자 데이터는 Git에서 제외된
-`.huggingface/cache`에 저장됩니다.
+`./huggingface/cache`에 저장됩니다.
 
 | 호스트 경로 | `huggingface` 컨테이너 | `triton` 컨테이너 |
 |---|---|---|
 | `./huggingface/workspace` | `/workspace` | - |
-| `.huggingface/cache` | `/root/.codex` | - |
+| `./huggingface/cache` | `/root/.codex` | - |
 | `./huggingface/workspace/.cache/huggingface` | `/workspace/.cache/huggingface` | `/root/.cache/huggingface` |
 | `./huggingface/model_repository` | `/workspace/model_repository` | `/models` |
 | `/mnt/datasets` | `/workspace/datasets` | - |
 
 Codex는 공식 설치 스크립트의 Linux 기본값을 사용합니다. 실행 명령은
 `/root/.local/bin/codex`, 설정·인증·세션 및 standalone 패키지 데이터는
-`/root/.codex`에 저장됩니다. `/root/.codex`는 `.huggingface/cache`와
+`/root/.codex`에 저장됩니다. `/root/.codex`는 `./huggingface/cache`와
 연결되며, 이 폴더는 `.gitignore`와 `.dockerignore`에서 제외됩니다.
 빈 캐시로 처음 실행할 때는 이미지에 보관된 기본 설치 파일을 자동으로
 초기화합니다.
@@ -196,4 +195,4 @@ docker compose up -d huggingface
   낮춥니다.
 - Hugging Face 캐시와 모델 저장소 내용은 `.gitignore`에서 제외되지만
   호스트에는 계속 보존됩니다.
-- Codex 영속 데이터는 Git에서 제외된 `.huggingface/cache`에 보존됩니다.
+- Codex 영속 데이터는 Git에서 제외된 `./huggingface/cache`에 보존됩니다.
