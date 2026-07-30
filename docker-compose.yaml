@@ -17,8 +17,8 @@ services:
         if [[ ! -x /root/.codex/packages/standalone/current/codex ]]; then
           cp -a /opt/codex-default/. /root/.codex/
         fi
-        if [[ -x /workspace/.codex-remote/start.sh ]]; then
-          exec /workspace/.codex-remote/start.sh
+        if [[ -x /root/.codex/bin/remote-control-start.sh ]]; then
+          exec /root/.codex/bin/remote-control-start.sh
         fi
         echo "Codex remote startup script not found; keeping the container available."
         exec sleep infinity
