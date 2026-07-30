@@ -8,7 +8,6 @@ services:
     image: mf-huggingface:1.0
     container_name: huggingface
     working_dir: /workspace
-
     init: true
     restart: always
     entrypoint:
@@ -20,26 +19,22 @@ services:
         fi
         echo "Codex remote startup script not found; keeping the container available."
         exec sleep infinity
-
     ipc: host
     stdin_open: true
     tty: true
     shm_size: "128gb"
     gpus: all
-
     environment:
       HF_HOME: /workspace/.cache/huggingface
       HF_HUB_CACHE: /workspace/.cache/huggingface/hub
       HF_DATASETS_CACHE: /workspace/.cache/huggingface/datasets
       HF_TOKEN: ${HF_TOKEN:-}
       CODEX_HOME: /root/.codex
-
     volumes:
       - ./huggingface/workspace:/workspace
       - ./huggingface/cache:/root/.codex
       - ./huggingface/model_repository:/workspace/model_repository
       - /mnt/datasets:/workspace/datasets
-
     command: ["sleep", "infinity"]
 
   triton:
