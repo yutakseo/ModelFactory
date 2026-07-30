@@ -32,10 +32,11 @@ services:
       HF_HUB_CACHE: /workspace/.cache/huggingface/hub
       HF_DATASETS_CACHE: /workspace/.cache/huggingface/datasets
       HF_TOKEN: ${HF_TOKEN:-}
-      CODEX_HOME: /workspace/.codex-persistent
+      CODEX_HOME: /root/.codex
 
     volumes:
       - ./huggingface/workspace:/workspace
+      - ./huggingface/cache:/root/.codex
       - ./huggingface/model_repository:/workspace/model_repository
       - /mnt/datasets:/workspace/datasets
 
