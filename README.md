@@ -22,7 +22,7 @@ TensorRT-LLM으로 모델을 서빙하기 위한 Docker Compose 환경입니다.
 - 베이스 이미지: `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
 - 컨테이너 이름: `huggingface`
 - 작업 경로: `/workspace`
-- Codex 영속 경로: `/root/.codex`
+- Codex 기본 경로: `/root/.codex`
 - 공유 메모리: `128gb`
 - GPU: 전체 GPU 사용
 - 실행 명령: `sleep infinity`
@@ -60,7 +60,6 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 │   ├── Dockerfile
 │   ├── workspace/
 │   │   └── .cache/huggingface/   # 실행 중 생성되는 Hugging Face 캐시
-│   ├── cache/                     # 컨테이너 생성 시 만들어지는 Codex 데이터
 │   └── model_repository/         # Hugging Face와 Triton이 공유하는 모델 저장소
 └── triton/
     └── Dockerfile
@@ -68,24 +67,23 @@ TensorRT-LLM backend가 포함된 Triton 추론 서버입니다.
 
 ## 볼륨과 경로 연결
 
-모든 작업 파일, 모델 저장소 및 캐시는 Docker named volume이 아닌 호스트의
-`huggingface/` 폴더에 저장됩니다.
+작업 파일, 모델 저장소 및 Hugging Face 캐시는 호스트의 `huggingface/`
+폴더에 저장됩니다. Codex 사용자 데이터는 저장소와 분리된 Docker named
+volume에 저장됩니다.
 
 | 호스트 경로 | `huggingface` 컨테이너 | `triton` 컨테이너 |
 |---|---|---|
 | `./huggingface/workspace` | `/workspace` | - |
-| `./huggingface/cache` | `/root/.codex` | - |
+| Docker volume `codex_home` | `/root/.codex` | - |
 | `./huggingface/workspace/.cache/huggingface` | `/workspace/.cache/huggingface` | `/root/.cache/huggingface` |
 | `./huggingface/model_repository` | `/workspace/model_repository` | `/models` |
 | `/mnt/datasets` | `/workspace/datasets` | - |
 
-Codex 실행 파일은 이미지의 `/opt/codex` 아래에 설치되고
-`/usr/local/bin/codex`로 실행됩니다. 설정, 인증 및 세션 데이터가 기록되는
-원래 사용자 경로 `/root/.codex`만 호스트의 `huggingface/cache` 폴더와
-연결됩니다. 이 호스트 폴더는 저장소에 미리 만들지 않으며, 컨테이너를
-처음 생성할 때 Docker가 자동으로 만듭니다. 따라서 Codex 데이터는
-컨테이너의 `/workspace`와 호스트의 `huggingface/workspace` 안에 나타나지
-않습니다.
+Codex는 공식 설치 스크립트의 Linux 기본값을 사용합니다. 실행 명령은
+`/root/.local/bin/codex`, 설정·인증·세션 및 standalone 패키지 데이터는
+`/root/.codex`에 저장됩니다. `/root/.codex`는 Docker named volume
+`codex_home`과 연결되므로 개인 데이터가 저장소 작업 트리에 생성되거나
+Git에 포함되지 않습니다.
 
 PyTorch 컨테이너에서 `/workspace/model_repository`에 모델을 내보내면 호스트의
 `huggingface/model_repository`에 저장되고, Triton은 같은 파일을 `/models`에서
@@ -193,7 +191,7 @@ docker compose up -d huggingface
 - `shm_size`는 호스트의 실제 메모리 용량에 맞게 조절해야 합니다.
 - `ipc: host`는 PyTorch 멀티프로세싱에 유용하지만 컨테이너 격리 수준을
   낮춥니다.
-- Hugging Face 캐시, 모델 저장소 및 Codex 영속 데이터의 내용은
-  `.gitignore`에서 제외되지만 호스트에는 계속 보존됩니다.
-- Codex 인증 정보를 포함할 수 있는 `huggingface/cache`는
-  `.dockerignore`에서도 제외되어 이미지 빌드 컨텍스트로 전송되지 않습니다.
+- Hugging Face 캐시와 모델 저장소 내용은 `.gitignore`에서 제외되지만
+  호스트에는 계속 보존됩니다.
+- Codex 영속 데이터는 Git 작업 트리 밖의 Docker named volume
+  `codex_home`에 보존됩니다.

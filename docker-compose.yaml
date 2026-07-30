@@ -33,7 +33,7 @@ services:
     volumes:
       - ./huggingface/workspace:/workspace
       - ./huggingface/model_repository:/workspace/model_repository
-      - ./huggingface/cache:/root/.codex
+      - codex_home:/root/.codex
       - /mnt/datasets:/workspace/datasets
     command: ["sleep", "infinity"]
 
@@ -62,3 +62,6 @@ services:
       - /bin/bash
       - -c
       - exec tritonserver --model-repository=/models
+
+volumes:
+  codex_home:

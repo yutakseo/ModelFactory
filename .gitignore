@@ -1,5 +1,13 @@
+# Local credentials, tokens, and runtime state
+.env
+.env.*
+!.env.example
+.codex/
+.codex-persistent/
 huggingface/.cache/
 huggingface/cache/
+
+# Generated models and workspace files
 huggingface/model_repository/*
 !huggingface/model_repository/.gitkeep
 huggingface/workspace/*
