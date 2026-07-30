@@ -14,6 +14,7 @@ RUN apt-get update \
         openssh-server \
     && curl -fsSL https://chatgpt.com/codex/install.sh \
         | CODEX_NON_INTERACTIVE=true sh \
+    && cp -a /root/.codex /opt/codex-default \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/requirements.txt

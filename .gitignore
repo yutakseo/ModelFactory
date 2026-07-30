@@ -4,6 +4,7 @@
 !.env.example
 .codex/
 .codex-persistent/
+.huggingface/cache/
 huggingface/.cache/
 huggingface/cache/
 
