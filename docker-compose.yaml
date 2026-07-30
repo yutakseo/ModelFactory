@@ -32,8 +32,8 @@ services:
       CODEX_HOME: /root/.codex
     volumes:
       - ./huggingface/workspace:/workspace
-      - ./huggingface/cache:/root/.codex
       - ./huggingface/model_repository:/workspace/model_repository
+      - ./huggingface/cache:/root/.codex
       - /mnt/datasets:/workspace/datasets
     command: ["sleep", "infinity"]
 
